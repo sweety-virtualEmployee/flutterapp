@@ -19,6 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   TextEditingController title = TextEditingController();
   TextEditingController body = TextEditingController();
   late AndroidNotificationChannel channel;
+  final _formKey = GlobalKey<FormState>();
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   String? mtoken = " ";
@@ -26,25 +27,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-
     requestPermission();
-
     loadFCM();
-
     listenFCM();
-
     getToken();
-
     FirebaseMessaging.instance.subscribeToTopic("Animal");
   }
 
-  void getTokenFromFirestore() async {
-
-  }
+  void getTokenFromFirestore() async {}
 
   void saveToken(String token) async {
     await FirebaseFirestore.instance.collection("UserTokens").doc("User1").set({
-      'token' : token,
+      'token': token,
     });
   }
 
@@ -54,14 +48,12 @@ class _MainScreenState extends State<MainScreen> {
         Uri.parse('https://fcm.googleapis.com/fcm/send'),
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': 'key=AAAA6IAb9qE:APA91bGvMV5a7qKjzdeKuCO4ux7Z163jUiZM_5wCefl3xhNRcQ0xevPWMsXiGjJ8ee6mByOtQUpR7Y4kpkCPux_K4b47jJwamDdREIDjHPe8tmBvm6qiMa3a6a_yccj8jqzYlDuXvwKX',
+          'Authorization':
+              'key=AAAA6IAb9qE:APA91bGvMV5a7qKjzdeKuCO4ux7Z163jUiZM_5wCefl3xhNRcQ0xevPWMsXiGjJ8ee6mByOtQUpR7Y4kpkCPux_K4b47jJwamDdREIDjHPe8tmBvm6qiMa3a6a_yccj8jqzYlDuXvwKX',
         },
         body: jsonEncode(
           <String, dynamic>{
-            'notification': <String, dynamic>{
-              'body': body,
-              'title': title
-            },
+            'notification': <String, dynamic>{'body': body, 'title': title},
             'priority': 'high',
             'data': <String, dynamic>{
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -78,15 +70,13 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void getToken() async {
-    await FirebaseMessaging.instance.getToken().then(
-            (token) {
-          setState(() {
-            mtoken = token;
-          });
+    await FirebaseMessaging.instance.getToken().then((token) {
+      setState(() {
+        mtoken = token;
+      });
 
-          saveToken(token!);
-        }
-    );
+      saveToken(token!);
+    });
   }
 
   void requestPermission() async {
@@ -104,7 +94,8 @@ class _MainScreenState extends State<MainScreen> {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
@@ -151,7 +142,7 @@ class _MainScreenState extends State<MainScreen> {
       /// default FCM channel to enable heads up notifications.
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
 
       /// Update the iOS foreground notification presentation options to allow
@@ -168,9 +159,95 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+        body: /*Form(
+          child: Column(
+            key: _formKey,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  obscureText: true,
+                  autofocus: false,
+                  style: const TextStyle(fontSize: 15.0, color: Colors.black),
+                  decoration: InputDecoration(
+                    hintText: 'UserName',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: Colors.grey, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.only(
+                        left: 14.0, bottom: 6.0, top: 8.0),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.indigo),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Stack(
+                  alignment: const Alignment(0, 0),
+                  children: <Widget>[
+                    TextField(
+                      obscureText: true,
+                      autofocus: false,
+                      style: const TextStyle(fontSize: 15.0, color: Colors.black),
+                      decoration: InputDecoration(
+                        hintText: 'password',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: const BorderSide(color: Colors.grey, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.only(
+                            left: 14.0, bottom: 6.0, top: 8.0),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.indigo),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                    child: MaterialButton(
+                      color: Colors.indigo,
+                      onPressed: () {},
+                      child: const Text(
+                        'Submit',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                          side: const BorderSide(color: Colors.indigo)),
+                    ),
+                  )),
+            ],
+          ),
+        )*/
+
+         Padding(
+        padding: const EdgeInsets.only(top:50.0,left: 20,right: 20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+
           children: [
             TextFormField(
               controller: username,
@@ -181,6 +258,7 @@ class _MainScreenState extends State<MainScreen> {
             TextFormField(
               controller: body,
             ),
+            const SizedBox(height: 50,),
             GestureDetector(
               onTap: () async {
                 String name = username.text.trim();
@@ -200,12 +278,13 @@ class _MainScreenState extends State<MainScreen> {
               child: Container(
                 height: 40,
                 width: 200,
-                color: Colors.red,
+                color: Colors.indigo,
+                child: const Center(child: Text("Send",style: TextStyle(color: Colors.white),)),
               ),
             ),
           ],
         ),
       ),
-    );
+        );
   }
 }
